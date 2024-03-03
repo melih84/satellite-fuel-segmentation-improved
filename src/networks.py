@@ -2,11 +2,13 @@
 # import skimage.io as io
 # import skimage.transform as trans
 import numpy as np
-from keras.models import Model
-from keras.layers import Input, BatchNormalization, Conv2D
-from keras.layers import Activation, MaxPool2D, Conv2DTranspose, concatenate
-from keras.optimizers import Adam
-from keras.metrics import RootMeanSquaredError
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input, BatchNormalization, Conv2D
+from tensorflow.keras.layers import Activation, MaxPool2D, Conv2DTranspose, concatenate
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.metrics import RootMeanSquaredError
+from tensorflow.keras.losses import SparseCategoricalCrossentropy
+
 # from keras.optimizers import schedules
 # from keras.callbacks import ModelCheckpoint, LearningRateScheduler
 # from keras import backend as keras
@@ -102,7 +104,7 @@ def unet(pretrained_weights = None, input_size = (60,60,1), output_classes = 1):
     conv18 = Conv2D(64, 3, padding='same', kernel_initializer='he_normal', name='conv18')(L17)
     bn18 = BatchNormalization(3, name='bn18')(conv18) 
     L18 = Activation('relu')(bn18)
-    conv19 = Conv2D(output_classes, 1, activation="relu", kernel_initializer='he_normal', name='output')(L18)
+    conv19 = Conv2D(output_classes, 1, activation="softmax", kernel_initializer='he_normal', name='output')(L18)
 
 
     model = Model(inputs = inputs, outputs = conv19)
@@ -110,14 +112,14 @@ def unet(pretrained_weights = None, input_size = (60,60,1), output_classes = 1):
     #lr_schedule = schedules.ExponentialDecay(initial_learning_rate = 1e-3, decay_steps = 600, decay_rate = .1, staircase = True)
 
     model.compile(optimizer = Adam(learning_rate = 1e-3),
-                  loss = 'mean_squared_error',
-                  metrics = [RootMeanSquaredError()])
+                  loss = SparseCategoricalCrossentropy(),
+                  metrics = ["accuracy"])
 
     
     if(pretrained_weights):
         model.load_weights(pretrained_weights)
 
-    print("Comment: relu")
+    print("Comment: softmax")
 
     return model
 
