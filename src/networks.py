@@ -12,7 +12,7 @@ from keras.metrics import RootMeanSquaredError
 # from keras import backend as keras
 
 
-def unet(pretrained_weights = None, input_size = (60,60,1)):
+def unet(pretrained_weights = None, input_size = (60,60,1), output_classes = 1):
     """
     This UNet architecture is based on this paper:
         "Computer vision-based concrete crack detection using U-net fully convolutional networks"
@@ -102,7 +102,7 @@ def unet(pretrained_weights = None, input_size = (60,60,1)):
     conv18 = Conv2D(64, 3, padding='same', kernel_initializer='he_normal', name='conv18')(L17)
     bn18 = BatchNormalization(3, name='bn18')(conv18) 
     L18 = Activation('relu')(bn18)
-    conv19 = Conv2D(1, 1, activation="relu", kernel_initializer='he_normal', name='output')(L18)
+    conv19 = Conv2D(output_classes, 1, activation="relu", kernel_initializer='he_normal', name='output')(L18)
 
 
     model = Model(inputs = inputs, outputs = conv19)
