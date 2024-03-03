@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import skimage as ski 
+from skimage.transform import resize
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -33,6 +34,11 @@ def get_class_label(label):
         mask = red_c * green_c * blue_c
         label_dict[cls] = mask.astype("int")
     return label_dict
+
+def apply_resize(img, lbl_dict, size):
+    small_img = resize(img, size, preserve_range=True, anti_aliasing=True).astype("int")
+    small_lbl_dict = {cls: resize(lbl, size, order=0, preserve_range=True) for cls, lbl in lbl_dict.items()}
+    return small_img, small_lbl_dict
 
 def get_batch(img_idx, lbl_idx, batch_size):
     img_batch = img_idx[:batch_size]
