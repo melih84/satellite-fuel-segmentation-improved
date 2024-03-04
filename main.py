@@ -54,6 +54,7 @@ def get_batch(img_idx, lbl_idx, batch_size, size=None):
         X_arr = image / 255    # (640, 640, 3); normalize by 255
         y_arr = np.array([arr for arr in lbl_dict.values()])  # (CLS, 640, 640)
         y_arr = np.moveaxis(y_arr, 0, -1)   # (640, 640, CLS)
+        print(f"Error in Label {lbl.name}") if (y_arr.sum(axis=-1) != 1).sum() else None
         X.append(X_arr)
         y.append(y_arr)
 
@@ -63,8 +64,8 @@ def get_batch(img_idx, lbl_idx, batch_size, size=None):
     print("="*10)
     return X, y     # (B, 640, 640, 3); (B, 640, 640, CLS)
 
-X, y = get_batch(img_idx, lbl_idx, batch_size=128, size=(64, 64))
+X, y = get_batch(img_idx, lbl_idx, batch_size=128, size=(64,64))
 
 model = unet(input_size=(64,64,3), output_classes=3)
 model.summary()
-hist = model.fit(X, y, batch_size=2, epochs=20)
+# hist = model.fit(X, y, batch_size=2, epochs=2)
