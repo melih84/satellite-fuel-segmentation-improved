@@ -112,7 +112,7 @@ def unet(pretrained_weights = None, input_size = (60,60,1), output_classes = 1):
     #lr_schedule = schedules.ExponentialDecay(initial_learning_rate = 1e-3, decay_steps = 600, decay_rate = .1, staircase = True)
 
     model.compile(optimizer = Adam(learning_rate = 1e-3),
-                  loss = SparseCategoricalCrossentropy(),
+                  loss = 'categorical_crossentropy',
                   metrics = ["accuracy"])
 
     
