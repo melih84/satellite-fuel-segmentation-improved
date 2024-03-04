@@ -4,8 +4,6 @@ import skimage as ski
 from skimage.transform import resize
 import numpy as np
 
-
-
 class Data():
     def __init__(self, image_dir, mask_dir, class_dict):
         self.class_dict = class_dict
@@ -45,7 +43,9 @@ class Data():
             X_arr = image / 255    # (640, 640, 3); normalize by 255
             y_arr = np.array([arr for arr in lbl_dict.values()])  # (CLS, 640, 640)
             y_arr = np.moveaxis(y_arr, 0, -1)   # (640, 640, CLS)
+
             print(f"Error in Label {lbl.name}") if (y_arr.sum(axis=-1) != 1).sum() else None
+            
             X.append(X_arr)
             y.append(y_arr)
         X, y = np.array(X), np.array(y)
