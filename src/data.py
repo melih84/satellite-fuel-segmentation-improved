@@ -9,14 +9,13 @@ import numpy as np
 class Data():
     def __init__(self, image_dir, mask_dir, class_dict):
         self.class_dict = class_dict
-        self._get_class_label()
         self.image_dir = image_dir
         self.mask_dir = mask_dir
         self._get_filenames()
         print(f"Number of images: {len(self.img_idx)}")
         print(f"Number of labels: {len(self.lbl_idx)}")
         print("="*10)   
-    
+        
     def _get_filenames(self):
         path_img = Path(self.image_dir)
         path_lbl = Path(self.mask_dir)
