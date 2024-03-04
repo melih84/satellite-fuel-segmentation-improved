@@ -63,8 +63,8 @@ def get_batch(img_idx, lbl_idx, batch_size, size=None):
     print("="*10)
     return X, y     # (B, 640, 640, 3); (B, 640, 640, CLS)
 
-X, y = get_batch(img_idx, lbl_idx, batch_size=8, size=(64, 64))
+X, y = get_batch(img_idx, lbl_idx, batch_size=128, size=(64, 64))
 
-model = unet(input_size=(640,640,3), output_classes=3)
+model = unet(input_size=(64,64,3), output_classes=3)
 model.summary()
-hist = model.fit(X, y, batch_size=1, epochs=10)
+hist = model.fit(X, y, batch_size=2, epochs=20)
