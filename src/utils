@@ -1,0 +1,25 @@
+import numpy as np
+
+COLOR_CODE = {
+    "orange": [255, 165, 0],
+    "green": [1, 50, 32],
+    "black": [0, 0, 0]
+    }
+
+class Visualize():
+    def __init__(self):
+        self.color_scheme = ["orange, green", "black"]
+    
+    def multi_class(self, masks):
+        comb_mask = np.zeros(masks.shape[:2] + (3,))
+        n_class = masks.shape[-1]
+        for cls in range(n_class):
+            comb_mask += self._paint(masks[:,:,cls], self.color_scheme[cls])
+
+        return comb_mask
+    
+    def _paint(mask, color):
+        new_mask = np.zeros(mask.shape)
+        for i in range(3):
+            new_mask[:,:,i] = COLOR_CODE[color]
+        return new_mask
