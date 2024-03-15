@@ -1,9 +1,14 @@
+import json
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from tensorflow.keras.callbacks import TensorBoard
 
 from src.networks import unet
 from src.data import Data
+from src.evaluate import make_predicitons, get_metrics
+from src.utils import Visualize
 
 IMAGE_SIZE = (128, 128)
 
@@ -30,20 +35,32 @@ def main():
     X_train, y_train = train_data.get_batch(batch_size=32, size=IMAGE_SIZE)
     X_valid, y_valid = valid_data.get_batch(batch_size=4, size=IMAGE_SIZE)
 
-    model = unet(input_size=X_train.shape[1,:], output_classes=3)
+    model = unet(input_size=X_train.shape[1:], output_classes=3)
     model.summary()
+
+    tb_cb = TensorBoard(log_dir = study_id+"logs",
+                        write_graph=True,
+                        update_freq=1)
     hist = model.fit(X_train, y_train,
                     batch_size=2,
-                    epochs=20,
-                    validation_data=(X_valid, y_valid))
+                    epochs=2,
+                    validation_data=(X_valid, y_valid),
+                    callbacks=[tb_cb])
 
-    model.save(study_id+"model/")
+    # model.save(study_id+"model/")
+    probs, y_pred = make_predicitons(model, X_valid)
+    metrics = get_metrics(y_valid, y_pred)
+    with open(study_id+"metrics.json", "w") as f:
+        json.dump(metrics, f)
+
+    print(pd.DataFrame(metrics))
     # probs = model.predict(X_valid)
 
     # y_pred = np.argmax(probs, axis=-1)
 
+#TODO add checkpoints
 #TODO add tensorboard with sample images
-#TODO calcualte ans store recall, precision, F1-score, IoU per class and the confusion matrix
+
 
 if __name__ == "__main__":
     study_id = "experiments/study-00/"
