@@ -5,7 +5,10 @@ COLOR_CODE = {
     "orange": [255, 165, 0],
     "darkgreen": [1, 50, 32],
     "limegreen": [50, 205, 50],
-    "black": [0, 0, 0]
+    "springgreen": [0, 255, 127],
+    "palegreen": [152, 251, 152],
+    "black": [0, 0, 0],
+    "gray": [119, 136, 153]
     }
 
 class Visualize():
