@@ -21,5 +21,9 @@ def get_metrics(ground_truth, prediction, class_to_fuel=None):
         f1[cls_id] = f1_score(y_true, y_pred)
         iou[cls_id] = jaccard_score(y_true, y_pred)
         ratio[cls_id] = y_true.sum() / y_true.size
-    return pr, rc, f1, iou, ratio
+    return {"precision": pr,
+            "recall": rc,
+            "f1-score": f1,
+            "iou": iou,
+            "class ratio": ratio}
 
