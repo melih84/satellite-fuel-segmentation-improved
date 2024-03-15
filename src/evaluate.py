@@ -11,7 +11,7 @@ def make_predicitons(model, X):
 
 def get_metrics(ground_truth, prediction):
     n_class = ground_truth.shape[-1]
-    pr, rc, f1, iou = [], [], [], []
+    pr, rc, f1, iou, px = [], [], [], [], []
     for i in range(n_class):
         y_true = ground_truth[:,:,:,i].flatten()
         y_pred = prediction[:,:,:,i].flatten()
@@ -19,4 +19,5 @@ def get_metrics(ground_truth, prediction):
         rc.append(recall_score(y_true, y_pred))
         f1.append(f1_score(y_true, y_pred))
         iou.append(jaccard_score(y_true, y_pred))
-    return pr, rc, f1, iou
+        px.append(y_true.sum())
+    return pr, rc, f1, iou, px
