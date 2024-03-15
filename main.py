@@ -3,7 +3,7 @@ import json
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from tensorflow.keras.callbacks import TensorBoard
+from tensorflow.keras.callbacks import TensorBoard, EarlyStopping
 
 from src.networks import unet
 from src.data import Data
@@ -42,12 +42,16 @@ def main():
 #TODO add sample images to tensorboard
     tb_cb = TensorBoard(log_dir=root_path+study_id+"logs",
                         write_graph=True,
+
                         update_freq=1)
+    es_cb = EarlyStopping(monitor="val_loss",
+                          patience=10)
+
     hist = model.fit(X_train, y_train,
                     batch_size=2,
                     epochs=3,
                     validation_data=(X_valid, y_valid),
-                    callbacks=[tb_cb])
+                    callbacks=[tb_cb, es_cb])
 
     # model.save(study_id+"model/")
     with open(root_path+study_id+"learning_history.json", "w") as f:
@@ -63,8 +67,6 @@ def main():
     # probs = model.predict(X_valid)
 
     # y_pred = np.argmax(probs, axis=-1)
-
-#TODO add checkpoints
 
 
 if __name__ == "__main__":
