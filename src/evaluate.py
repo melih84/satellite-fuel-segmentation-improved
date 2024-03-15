@@ -21,6 +21,13 @@ def get_metrics(ground_truth, prediction, class_to_fuel=None):
         f1[cls_id] = f1_score(y_true, y_pred)
         iou[cls_id] = jaccard_score(y_true, y_pred)
         ratio[cls_id] = y_true.sum() / y_true.size
+
+    _mean = lambda metric: np.mean([m for _, m in metric.items()])
+    pr["mean"] = _mean(pr)
+    rc["mean"] = _mean(rc)
+    f1["mean"] = _mean(f1)
+    iou["mean"] = _mean(iou)
+    ratio["mean"] = _mean(ratio)
     return {"precision": pr,
             "recall": rc,
             "f1-score": f1,
