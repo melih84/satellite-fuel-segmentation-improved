@@ -6,7 +6,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, BatchNormalization, Conv2D
 from tensorflow.keras.layers import Activation, MaxPool2D, Conv2DTranspose, concatenate
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.metrics import RootMeanSquaredError
+from tensorflow.keras.metrics import MeanIoU, F1Score
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 
 # from keras.optimizers import schedules
@@ -113,7 +113,7 @@ def unet(pretrained_weights = None, input_size = (60,60,1), output_classes = 1):
 
     model.compile(optimizer = Adam(learning_rate = 1e-3),
                   loss = 'categorical_crossentropy',
-                  metrics = ["accuracy"])
+                  metrics = [MeanIoU(num_classes=output_classes)])
 
     
     if(pretrained_weights):
