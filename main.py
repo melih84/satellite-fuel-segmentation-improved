@@ -32,25 +32,31 @@ def main():
                       class_dict=class_dict)
 
 
-    X_train, y_train = train_data.get_batch(batch_size=32, size=IMAGE_SIZE)
-    X_valid, y_valid = valid_data.get_batch(batch_size=4, size=IMAGE_SIZE)
+    X_train, y_train = train_data.get_batch(batch_size=4, size=IMAGE_SIZE)
+    X_valid, y_valid = valid_data.get_batch(batch_size=2, size=IMAGE_SIZE)
+
 
     model = unet(input_size=X_train.shape[1:], output_classes=3)
     model.summary()
 
-    tb_cb = TensorBoard(log_dir = study_id+"logs",
+#TODO add sample images to tensorboard
+    tb_cb = TensorBoard(log_dir=root_path+study_id+"logs",
                         write_graph=True,
                         update_freq=1)
     hist = model.fit(X_train, y_train,
                     batch_size=2,
-                    epochs=2,
+                    epochs=3,
                     validation_data=(X_valid, y_valid),
                     callbacks=[tb_cb])
 
     # model.save(study_id+"model/")
+    with open(root_path+study_id+"learning_history.json", "w") as f:
+        json.dump(hist.history, f)
+    
+    # evaluations
     probs, y_pred = make_predicitons(model, X_valid)
     metrics = get_metrics(y_valid, y_pred)
-    with open(study_id+"metrics.json", "w") as f:
+    with open(root_path+study_id+"metrics.json", "w") as f:
         json.dump(metrics, f)
 
     print(pd.DataFrame(metrics))
@@ -59,9 +65,9 @@ def main():
     # y_pred = np.argmax(probs, axis=-1)
 
 #TODO add checkpoints
-#TODO add tensorboard with sample images
 
 
 if __name__ == "__main__":
-    study_id = "experiments/study-00/"
+    root_path = "experiments/"
+    study_id = "study-00/"
     main()
