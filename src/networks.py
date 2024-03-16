@@ -6,7 +6,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, BatchNormalization, Conv2D
 from tensorflow.keras.layers import Activation, MaxPool2D, Conv2DTranspose, concatenate
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.metrics import MeanIoU, F1Score
+from tensorflow.keras.metrics import MeanIoU#, F1Score
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 
 # from keras.optimizers import schedules
