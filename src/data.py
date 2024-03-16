@@ -44,7 +44,7 @@ class Data():
             y_arr = np.array([arr for arr in lbl_dict.values()])  # (CLS, 640, 640)
             y_arr = np.moveaxis(y_arr, 0, -1)   # (640, 640, CLS)
 
-            print(f"Error in Label {lbl.name}") if (y_arr.sum(axis=-1) != 1).sum() else None
+            print(f"Error in Label {lbl.name}") if (y_arr.sum(axis=-1) != 1).all() else None
             
             X.append(X_arr)
             y.append(y_arr)
