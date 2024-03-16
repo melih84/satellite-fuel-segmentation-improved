@@ -36,8 +36,8 @@ def main():
                       class_dict=class_dict)
 
 
-    X_train, y_train = train_data.get_batch(batch_size=766, size=IMAGE_SIZE)
-    X_valid, y_valid = valid_data.get_batch(batch_size=420, size=IMAGE_SIZE)
+    X_train, y_train = train_data.get_batch(batch_size=200, size=IMAGE_SIZE)
+    X_valid, y_valid = valid_data.get_batch(batch_size=20, size=IMAGE_SIZE)
 
 
     model = unet(input_size=X_train.shape[1:], output_classes=3)
@@ -58,7 +58,7 @@ def main():
                     callbacks=[tb_cb, es_cb])
 
     model.save(root_path+study_id+"model/")
-    
+
     with open(root_path+study_id+"learning_history.json", "w") as f:
         json.dump(hist.history, f)
     
