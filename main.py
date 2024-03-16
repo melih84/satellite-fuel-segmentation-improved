@@ -1,6 +1,7 @@
 import json
 import random
 import os
+import argparse
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -23,7 +24,10 @@ class_dict= df[["r", "g", "b"]].transpose().to_dict()
 class_to_fuel = {i:cls for i, cls in enumerate(class_dict.keys())}
 fuel_to_class = {cls:i for i, cls in enumerate(class_dict.keys())}
 
-def main():
+def main(configs):
+    n_epcohs = configs.n_epochs
+    batch_size = configs.batch_size
+
     train_root = "data/training_dataset/"
     train_data = Data(image_dir=train_root + "images/",
                     mask_dir=train_root + "masks/",
@@ -55,8 +59,8 @@ def main():
                           patience=50)
 
     hist = model.fit(X_train, y_train,
-                    batch_size=8,
-                    epochs=2,
+                    batch_size=batch_size,
+                    epochs=n_epcohs,
                     validation_data=(X_valid, y_valid),
                     callbacks=[tb_cb, es_cb])
 
@@ -108,6 +112,11 @@ def save_samples(X, y_true, y_pred, sample_list, save_to):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--n_epochs", type=int)
+    parser.add_argument("--batch_size", default=8, type=int)
     root_path = "experiments/"
     study_id = "study-00/"
-    main()
+
+    configs = parser.parse_args()
+    main(configs)
