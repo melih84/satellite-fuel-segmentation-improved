@@ -13,7 +13,7 @@ from src.evaluate import make_predicitons, get_metrics
 from src.utils import Visualize
 
 # IMAGE_SIZE = (128, 128)
-IMAGE_SIZE = None
+# IMAGE_SIZE = None
 
 class_info = "data/class_info.csv"
 df = pd.read_csv(class_info)
@@ -36,8 +36,8 @@ def main():
                       class_dict=class_dict)
 
 
-    X_train, y_train = train_data.get_batch(batch_size=200, size=IMAGE_SIZE)
-    X_valid, y_valid = valid_data.get_batch(batch_size=20, size=IMAGE_SIZE)
+    X_train, y_train = train_data.get_batch(batch_size=40, size=IMAGE_SIZE)
+    X_valid, y_valid = valid_data.get_batch(batch_size=10, size=IMAGE_SIZE)
 
 
     model = unet(input_size=X_train.shape[1:], output_classes=3)
@@ -52,7 +52,7 @@ def main():
                           patience=10)
 
     hist = model.fit(X_train, y_train,
-                    batch_size=32,
+                    batch_size=8,
                     epochs=200,
                     validation_data=(X_valid, y_valid),
                     callbacks=[tb_cb, es_cb])
