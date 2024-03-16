@@ -12,7 +12,7 @@ from src.data import Data
 from src.evaluate import make_predicitons, get_metrics
 from src.utils import Visualize
 
-# IMAGE_SIZE = (128, 128)
+IMAGE_SIZE = (128, 128)
 # IMAGE_SIZE = None
 
 class_info = "data/class_info.csv"
