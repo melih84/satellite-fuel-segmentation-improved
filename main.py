@@ -13,7 +13,7 @@ from src.data import Data
 from src.evaluate import make_predicitons, get_metrics
 from src.utils import Visualize
 
-IMAGE_SIZE = (128, 128)
+# IMAGE_SIZE = (128, 128)
 # IMAGE_SIZE = None
 
 class_info = "data/class_info.csv"
@@ -27,6 +27,9 @@ fuel_to_class = {cls:i for i, cls in enumerate(class_dict.keys())}
 def main(configs):
     n_epcohs = configs.n_epochs
     batch_size = configs.batch_size
+    image_size = configs.image_size
+    if image_size is not None:
+        image_size = (image_size, image_size) 
 
     train_root = "data/training_dataset/"
     train_data = Data(image_dir=train_root + "images/",
@@ -40,8 +43,8 @@ def main(configs):
                       class_dict=class_dict)
 
 
-    X_train, y_train = train_data.get_batch(batch_size=40, size=IMAGE_SIZE)
-    X_valid, y_valid = valid_data.get_batch(batch_size=10, size=IMAGE_SIZE)
+    X_train, y_train = train_data.get_batch(batch_size=40, size=image_size)
+    X_valid, y_valid = valid_data.get_batch(batch_size=10, size=image_size)
 
 
     model = unet(input_size=X_train.shape[1:], output_classes=3)
@@ -115,6 +118,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--n_epochs", type=int)
     parser.add_argument("--batch_size", default=8, type=int)
+    parser.add_argument("--image_size", default=None, type=int)
     root_path = "experiments/"
     study_id = "study-00/"
 
