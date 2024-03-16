@@ -12,7 +12,8 @@ from src.data import Data
 from src.evaluate import make_predicitons, get_metrics
 from src.utils import Visualize
 
-IMAGE_SIZE = (128, 128)
+# IMAGE_SIZE = (128, 128)
+IMAGE_SIZE = None
 
 class_info = "data/class_info.csv"
 df = pd.read_csv(class_info)
@@ -35,8 +36,8 @@ def main():
                       class_dict=class_dict)
 
 
-    X_train, y_train = train_data.get_batch(batch_size=4, size=IMAGE_SIZE)
-    X_valid, y_valid = valid_data.get_batch(batch_size=2, size=IMAGE_SIZE)
+    X_train, y_train = train_data.get_batch(batch_size=766, size=IMAGE_SIZE)
+    X_valid, y_valid = valid_data.get_batch(batch_size=420, size=IMAGE_SIZE)
 
 
     model = unet(input_size=X_train.shape[1:], output_classes=3)
@@ -51,12 +52,13 @@ def main():
                           patience=10)
 
     hist = model.fit(X_train, y_train,
-                    batch_size=2,
-                    epochs=1,
+                    batch_size=32,
+                    epochs=200,
                     validation_data=(X_valid, y_valid),
                     callbacks=[tb_cb, es_cb])
 
-    # model.save(study_id+"model/")
+    model.save(root_path+study_id+"model/")
+    
     with open(root_path+study_id+"learning_history.json", "w") as f:
         json.dump(hist.history, f)
     
