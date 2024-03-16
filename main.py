@@ -2,6 +2,7 @@ import json
 import random
 import os
 import argparse
+from pathlib import Path
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -28,6 +29,7 @@ def main(configs):
     n_epcohs = configs.n_epochs
     batch_size = configs.batch_size
     image_size = configs.image_size
+    run_dir = configs.run_dir
     if image_size is not None:
         image_size = (image_size, image_size) 
 
@@ -52,7 +54,7 @@ def main(configs):
 
 #TODO add sample images to tensorboard
 #TODO delete log dir if exists or incremet the log number
-    log_dir = log_dir=root_path+study_id+"logs"
+    log_dir = log_dir=run_dir / "logs"
     tb_cb = TensorBoard(log_dir=log_dir,
                         write_graph=True,
                         update_freq=1)
@@ -67,15 +69,16 @@ def main(configs):
                     validation_data=(X_valid, y_valid),
                     callbacks=[tb_cb, es_cb])
 
-    model.save(root_path+study_id+"model/")
+    model_dir = run_dir / "model"
+    model.save(model_dir)
 
-    with open(root_path+study_id+"learning_history.json", "w") as f:
+    with open(run_dir / "learning_history.json", "w") as f:
         json.dump(hist.history, f)
     
     # evaluations
     _, y_pred = make_predicitons(model, X_valid)
     metrics = get_metrics(y_valid, y_pred)
-    with open(root_path+study_id+"metrics.json", "w") as f:
+    with open(run_dir / "metrics.json", "w") as f:
         json.dump(metrics, f)
 
     print(pd.DataFrame(metrics))
@@ -84,7 +87,9 @@ def main(configs):
     n = min(X_valid.shape[0], 10)
     valid_samples = list(range(X_valid.shape[0]))
     random.shuffle(valid_samples)
-    save_dir = os.path.join(root_path, study_id, "samples/valid/")
+    sample_dir = run_dir / "samples"
+    save_dir = sample_dir / "validation"
+
     os.makedirs(save_dir) if not os.path.exists(save_dir) else None
     save_samples(X_valid, y_valid, y_pred, valid_samples[:n], save_dir)
     
@@ -92,7 +97,7 @@ def main(configs):
     n = min(X_train.shape[0], 10)
     valid_samples = list(range(X_train.shape[0]))
     random.shuffle(valid_samples)
-    save_dir = os.path.join(root_path, study_id, "samples/train/")
+    save_dir = sample_dir / "train"
     os.makedirs(save_dir) if not os.path.exists(save_dir) else None
     save_samples(X_train, y_train, y_train_pred, valid_samples[:n], save_dir)
     
@@ -108,7 +113,7 @@ def save_samples(X, y_true, y_pred, sample_list, save_to):
         viz.display(X[m,:,:,:],
                     y_true[m,:,:,:],
                     y_pred[m,:,:,:],
-                    save_to=save_to+f"{m}.png")
+                    save_to=save_to / f"{m}.png")
 
     print()
     print(f"Sample images saved to {save_to}")
@@ -119,8 +124,29 @@ if __name__ == "__main__":
     parser.add_argument("--n_epochs", type=int)
     parser.add_argument("--batch_size", default=8, type=int)
     parser.add_argument("--image_size", default=None, type=int)
+    
     root_path = "experiments/"
     study_id = "study-00/"
+    study_dir = Path("./experiments") / study_id
 
+    if not study_dir.exists():
+        run_num = 1
+    else:
+        exst_run_nums = [int(str(folder.name).split('run-')[1]) for folder in
+                         study_dir.iterdir() if
+                         str(folder.name).startswith('run-')]
+        if len(exst_run_nums) == 0:
+            run_num = 1
+        else:
+            run_num = max(exst_run_nums) + 1
+    
+    run_dir = study_dir / f"run-{run_num:02}"
+    os.makedirs(run_dir)
     configs = parser.parse_args()
+    configs.run_dir = run_dir
+
+    print("*"*20)
+    print(f"STUDY-ID: {study_id} / RUN: {run_num}")
+    print("*"*20)
+    
     main(configs)
