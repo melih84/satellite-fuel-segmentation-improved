@@ -44,16 +44,19 @@ def main():
     model.summary()
 
 #TODO add sample images to tensorboard
-    tb_cb = TensorBoard(log_dir=root_path+study_id+"logs",
+#TODO delete log dir if exists or incremet the log number
+    log_dir = log_dir=root_path+study_id+"logs"
+    tb_cb = TensorBoard(log_dir=log_dir,
                         write_graph=True,
-
                         update_freq=1)
+    
+    #TODO save best model
     es_cb = EarlyStopping(monitor="val_loss",
-                          patience=10)
+                          patience=50)
 
     hist = model.fit(X_train, y_train,
                     batch_size=8,
-                    epochs=200,
+                    epochs=2,
                     validation_data=(X_valid, y_valid),
                     callbacks=[tb_cb, es_cb])
 
@@ -63,7 +66,7 @@ def main():
         json.dump(hist.history, f)
     
     # evaluations
-    probs, y_pred = make_predicitons(model, X_valid)
+    _, y_pred = make_predicitons(model, X_valid)
     metrics = get_metrics(y_valid, y_pred)
     with open(root_path+study_id+"metrics.json", "w") as f:
         json.dump(metrics, f)
@@ -72,28 +75,36 @@ def main():
     #TODO add checkpoints
 
     n = min(X_valid.shape[0], 10)
-    ix = list(range(X_valid.shape[0]))
-    random.shuffle(ix)
-    save_samples(X_valid, y_valid, y_pred, ix[:n])
+    valid_samples = list(range(X_valid.shape[0]))
+    random.shuffle(valid_samples)
+    save_dir = os.path.join(root_path, study_id, "samples/valid/")
+    os.makedirs(save_dir) if not os.path.exists(save_dir) else None
+    save_samples(X_valid, y_valid, y_pred, valid_samples[:n], save_dir)
+    
+    _, y_train_pred = make_predicitons(model, X_train)
+    n = min(X_train.shape[0], 10)
+    valid_samples = list(range(X_train.shape[0]))
+    random.shuffle(valid_samples)
+    save_dir = os.path.join(root_path, study_id, "samples/train/")
+    os.makedirs(save_dir) if not os.path.exists(save_dir) else None
+    save_samples(X_train, y_train, y_train_pred, valid_samples[:n], save_dir)
     
 
-def save_samples(X, y_true, y_pred, sample_list):
+def save_samples(X, y_true, y_pred, sample_list, save_to):
     fuel_color = {
         "SurfaceFuels": "palegreen",
         "Canopy": "darkgreen",
         "Void": "gray"}
     color_scheme = [fuel_color[f] for _, f in class_to_fuel.items()]
     viz = Visualize(color_scheme)
-    save_dir = os.path.join(root_path, study_id, "samples/")
-    os.makedirs(save_dir) if not os.path.exists(save_dir) else None
     for m in sample_list:
         viz.display(X[m,:,:,:],
                     y_true[m,:,:,:],
                     y_pred[m,:,:,:],
-                    save_to=save_dir+f"{m}.png")
+                    save_to=save_to+f"{m}.png")
 
     print()
-    print(f"Sample images saved to {save_dir}")
+    print(f"Sample images saved to {save_to}")
 
 
 if __name__ == "__main__":
