@@ -14,9 +14,6 @@ from src.data import Data
 from src.evaluate import make_predicitons, get_metrics
 from src.utils import Visualize
 
-# IMAGE_SIZE = (128, 128)
-# IMAGE_SIZE = None
-
 class_info = "data/class_info.csv"
 df = pd.read_csv(class_info)
 df.index = df["name"]
@@ -52,8 +49,7 @@ def main(configs):
     model = unet(input_size=X_train.shape[1:], output_classes=3)
     model.summary()
 
-#TODO add sample images to tensorboard
-#TODO delete log dir if exists or incremet the log number
+    #TODO add sample images to tensorboard
     log_dir = log_dir=run_dir / "logs"
     tb_cb = TensorBoard(log_dir=log_dir,
                         write_graph=True,
@@ -77,7 +73,7 @@ def main(configs):
     
     # evaluations
     _, y_pred = make_predicitons(model, X_valid)
-    metrics = get_metrics(y_valid, y_pred)
+    metrics = get_metrics(y_valid, y_pred, class_to_fuel)
     with open(run_dir / "metrics.json", "w") as f:
         json.dump(metrics, f)
 
@@ -126,7 +122,7 @@ if __name__ == "__main__":
     parser.add_argument("--image_size", default=None, type=int)
     
     root_path = "experiments/"
-    study_id = "study-00/"
+    study_id = "study-00"
     study_dir = Path("./experiments") / study_id
 
     if not study_dir.exists():
@@ -146,7 +142,7 @@ if __name__ == "__main__":
     configs.run_dir = run_dir
 
     print("*"*20)
-    print(f"STUDY-ID: {study_id} / RUN: {run_num}")
+    print(f"STUDY-ID: {study_id} RUN: {run_num}")
     print("*"*20)
-    
+
     main(configs)
