@@ -7,7 +7,7 @@ from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from tensorflow.keras.callbacks import TensorBoard, EarlyStopping
+from tensorflow.keras.callbacks import TensorBoard, EarlyStopping, ModelCheckpoint
 
 from src.networks import unet
 from src.data import Data
@@ -47,7 +47,7 @@ def main(configs):
 
 
     model = unet(input_size=X_train.shape[1:], output_classes=3)
-    model.summary()
+    # model.summary()
 
     #TODO add sample images to tensorboard
     log_dir = log_dir=run_dir / "logs"
@@ -55,18 +55,22 @@ def main(configs):
                         write_graph=True,
                         update_freq=1)
     
-    #TODO save best model
     es_cb = EarlyStopping(monitor="val_loss",
                           patience=50)
+    
+    checkpoint_dir = run_dir / "checkpoints"
+    mod_cb = ModelCheckpoint(filepath=str(checkpoint_dir) + "/checkpoint.model-{epoch:02d}-{val_loss:.2f}.keras",
+                            monitor="val_loss",
+                            mode="min",
+                            save_best_only=True)
 
     hist = model.fit(X_train, y_train,
                     batch_size=batch_size,
                     epochs=n_epcohs,
                     validation_data=(X_valid, y_valid),
-                    callbacks=[tb_cb, es_cb])
+                    callbacks=[tb_cb, es_cb, mod_cb])
 
-    model_dir = run_dir / "model"
-    model.save(model_dir)
+    model.save(run_dir / "model")
 
     with open(run_dir / "learning_history.json", "w") as f:
         json.dump(hist.history, f)
@@ -142,7 +146,7 @@ if __name__ == "__main__":
     configs.run_dir = run_dir
 
     print("*"*20)
-    print(f"STUDY-ID: {study_id} RUN: {run_num}")
+    print(f"STUDY-ID: {study_id} / RUN: {run_num}")
     print("*"*20)
 
     main(configs)
