@@ -59,7 +59,7 @@ def main(configs):
                           patience=50)
     
     checkpoint_dir = run_dir / "checkpoints"
-    mod_cb = ModelCheckpoint(filepath=str(checkpoint_dir) + "/checkpoint.model-{epoch:02d}-{val_loss:.2f}.keras",
+    mod_cb = ModelCheckpoint(filepath=str(checkpoint_dir) + "/checkpoint.best_model.keras",
                             monitor="val_loss",
                             mode="min",
                             save_best_only=True)
@@ -68,7 +68,8 @@ def main(configs):
                     batch_size=batch_size,
                     epochs=n_epcohs,
                     validation_data=(X_valid, y_valid),
-                    callbacks=[tb_cb, es_cb, mod_cb])
+                    callbacks=[tb_cb, es_cb, mod_cb],
+                    verbose=1)
 
     model.save(run_dir / "model")
 
@@ -76,6 +77,7 @@ def main(configs):
         json.dump(hist.history, f)
     
     # evaluations
+    #TODO evaluate the best model not the last last model
     _, y_pred = make_predicitons(model, X_valid)
     metrics = get_metrics(y_valid, y_pred, class_to_fuel)
     with open(run_dir / "metrics.json", "w") as f:
@@ -145,8 +147,8 @@ if __name__ == "__main__":
     configs = parser.parse_args()
     configs.run_dir = run_dir
 
-    print("*"*20)
+    print("*"*40)
     print(f"STUDY-ID: {study_id} / RUN: {run_num}")
-    print("*"*20)
+    print("*"*40)
 
     main(configs)
