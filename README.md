@@ -1,6 +1,6 @@
 Project Compute Canada Cluster: **Graham**
 # Bugs
- - Image and labels are not matching when running on CC.
+ - Image and labels are not matching when running on CC. (Make sure images are selected by their names and all files are properly transfered)
  - The original image size run out of memery. 320 works fine.
 
 # TODO
