@@ -1,1 +1,1 @@
-Project's Compute Canada Cluster: Graham
+Project Compute Canada Cluster: **Graham**
