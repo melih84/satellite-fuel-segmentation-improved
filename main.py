@@ -70,8 +70,7 @@ def main(configs):
                     validation_data=(X_valid, y_valid),
                     callbacks=[tb_cb, es_cb, mod_cb],
                     verbose=1)
-
-    model.save(run_dir / "model")
+    model.save(run_dir / "model.keras")
 
     with open(run_dir / "learning_history.json", "w") as f:
         json.dump(hist.history, f)
