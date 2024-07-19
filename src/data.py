@@ -17,8 +17,8 @@ class Data():
     def _get_filenames(self):
         path_img = Path(self.image_dir)
         path_lbl = Path(self.mask_dir)
-        self.img_idx = list(path_img.glob("*.jpg"))
-        self.lbl_idx = list(path_lbl.glob('*.png'))
+        self.img_idx = sorted(list(path_img.glob("*.jpg")))
+        self.lbl_idx = sorted(list(path_lbl.glob('*.png')))
      
     def get_class_label(self, label):
         label_dict = {}
