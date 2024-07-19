@@ -42,7 +42,7 @@ def main(configs):
                       class_dict=class_dict)
 
 
-    X_train, y_train = train_data.get_batch(batch_size=40, size=image_size)
+    X_train, y_train = train_data.get_batch(batch_size=100, size=image_size)
     X_valid, y_valid = valid_data.get_batch(batch_size=10, size=image_size)
 
 
