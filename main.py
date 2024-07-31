@@ -153,6 +153,10 @@ if __name__ == "__main__":
     
     run_dir = study_dir / f"run-{run_num:02}"
     os.makedirs(run_dir)
+
+    with open(run_dir / "configs.json", "w") as f:
+        json.dump(vars(configs), f)
+
     configs.run_dir = run_dir
 
     print("*"*40)
