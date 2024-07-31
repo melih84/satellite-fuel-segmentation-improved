@@ -8,11 +8,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from tensorflow.keras.callbacks import TensorBoard, EarlyStopping, ModelCheckpoint
+import tensorflow as tf
 
 from src.networks import unet
 from src.data import Data
 from src.evaluate import make_predicitons, get_metrics
 from src.utils import Visualize
+
 
 class_info = "data/class_info.csv"
 df = pd.read_csv(class_info)
@@ -30,6 +32,10 @@ def main(configs):
     if image_size is not None:
         image_size = (image_size, image_size) 
 
+    random.seed(configs.seed)
+    np.random.seed(configs.seed)
+    tf.random.set_seed(configs.seed)
+
     train_root = "data/training_dataset_320x320/"
     train_data = Data(image_dir=train_root + "images/",
                     mask_dir=train_root + "masks/",
@@ -42,7 +48,7 @@ def main(configs):
                       class_dict=class_dict)
 
 
-    X_train, y_train = train_data.get_batch(batch_size=1000, size=image_size)
+    X_train, y_train = train_data.get_batch(batch_size=10, size=image_size)
     X_valid, y_valid = valid_data.get_batch(batch_size=10, size=image_size)
 
 
@@ -126,7 +132,8 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", default=8, type=int)
     parser.add_argument("--image_size", default=None, type=int)
     parser.add_argument("--study-id", default="study-00", type=str)
-    
+    parser.add_argument("--seed", default=42, type=int)
+
     configs = parser.parse_args()
     
     root_path = "experiments/"
