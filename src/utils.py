@@ -79,6 +79,8 @@ class DataProcessor():
     def apply_split(self, save_dir: str, division=2):
 
         #TODO split labels and save images
+        num_image = len(self.img_idx)
+        curr_num = 1
         sub_images, sub_labels = [], []
         for img_path, lbl_path in zip(self.img_idx, self.lbl_idx):
             image = ski.io.imread(img_path)
@@ -91,8 +93,10 @@ class DataProcessor():
                     sub_images.append((img_path.stem + f"_{count:02}" + img_path.suffix, image[i*h:(i+1)*h, j*w:(j+1)*w, :]))
                     sub_labels.append((lbl_path.stem + f"_{count:02}" + lbl_path.suffix, label[i*h:(i+1)*h, j*w:(j+1)*w, :]))
                     count += 1
-            break
-
+            print(f"Split {curr_num} / {num_image}", flush=True, end="\r")
+            curr_num += 1
+        
+        print("")
         if save_dir is not None:
             image_dir = Path(save_dir) / "images"
             label_dir = Path(save_dir) / "masks"
@@ -102,4 +106,5 @@ class DataProcessor():
             save_file(image_dir, sub_images)
             save_file(label_dir, sub_labels)
 
+        
         return sub_images, sub_labels
