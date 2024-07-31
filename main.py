@@ -30,19 +30,19 @@ def main(configs):
     if image_size is not None:
         image_size = (image_size, image_size) 
 
-    train_root = "data/training_dataset/"
+    train_root = "data/training_dataset_320x320/"
     train_data = Data(image_dir=train_root + "images/",
                     mask_dir=train_root + "masks/",
                     class_dict=class_dict)
 
-    valid_root = "data/verification_dataset/"
+    valid_root = "data/verification_dataset_320x320/"
 
     valid_data = Data(image_dir=valid_root + "images/",
                       mask_dir=valid_root + "masks/",
                       class_dict=class_dict)
 
 
-    X_train, y_train = train_data.get_batch(batch_size=100, size=image_size)
+    X_train, y_train = train_data.get_batch(batch_size=1000, size=image_size)
     X_valid, y_valid = valid_data.get_batch(batch_size=10, size=image_size)
 
 
@@ -125,9 +125,12 @@ if __name__ == "__main__":
     parser.add_argument("--n_epochs", type=int)
     parser.add_argument("--batch_size", default=8, type=int)
     parser.add_argument("--image_size", default=None, type=int)
+    parser.add_argument("--study-id", default="study-00", type=str)
+    
+    configs = parser.parse_args()
     
     root_path = "experiments/"
-    study_id = "study-00"
+    study_id = configs.study_id
     study_dir = Path("./experiments") / study_id
 
     if not study_dir.exists():
@@ -143,7 +146,6 @@ if __name__ == "__main__":
     
     run_dir = study_dir / f"run-{run_num:02}"
     os.makedirs(run_dir)
-    configs = parser.parse_args()
     configs.run_dir = run_dir
 
     print("*"*40)
