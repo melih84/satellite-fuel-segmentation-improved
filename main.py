@@ -48,12 +48,12 @@ def main(configs):
                       class_dict=class_dict)
 
 
-    X_train, y_train = train_data.get_batch(batch_size=10, size=image_size)
-    X_valid, y_valid = valid_data.get_batch(batch_size=10, size=image_size)
+    X_train, y_train = train_data.get_batch(batch_size=1000, size=image_size)
+    X_valid, y_valid = valid_data.get_batch(batch_size=100, size=image_size)
 
 
     model = unet(input_size=X_train.shape[1:], output_classes=3)
-    # model.summary()
+    model.summary()
 
     #TODO add sample images to tensorboard
     log_dir = log_dir=run_dir / "logs"
