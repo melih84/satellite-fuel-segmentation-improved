@@ -1,5 +1,10 @@
+from pathlib import Path
+import os
+
 import numpy as np
 import matplotlib.pyplot as plt
+import skimage as ski
+
 
 COLOR_CODE = {
     "orange": [255, 165, 0],
@@ -52,3 +57,49 @@ class Visualize():
         for i in range(3):
             new_mask[:,:,i] = mask * COLOR_CODE[color][i]
         return new_mask.astype("uint")
+    
+class DataProcessor():
+    def __init__(self, image_dir, mask_dir, class_dict):
+        self.class_dict = class_dict
+        self.image_dir = image_dir
+        self.mask_dir = mask_dir
+        self.img_idx = []
+        self.lbl_idx = []
+        self._get_filenames()
+        print(f"Number of images: {len(self.img_idx)}")
+        print(f"Number of labels: {len(self.lbl_idx)}")
+        print("="*10)   
+
+    def _get_filenames(self):
+        path_img = Path(self.image_dir)
+        path_lbl = Path(self.mask_dir)
+        self.img_idx = sorted(list(path_img.glob("*.jpg")))
+        self.lbl_idx = sorted(list(path_lbl.glob('*.png')))
+
+    def apply_split(self, save_dir: str, division=2):
+
+        #TODO split labels and save images
+        sub_images, sub_labels = [], []
+        for img_path, lbl_path in zip(self.img_idx, self.lbl_idx):
+            image = ski.io.imread(img_path)
+            label = ski.io.imread(lbl_path)
+            H, W, _ = image.shape
+            h, w = int(H/division), int(W/division)
+            count = 1
+            for i in range(division):
+                for j in range(division):
+                    sub_images.append((img_path.stem + f"_{count:02}" + img_path.suffix, image[i*h:(i+1)*h, j*w:(j+1)*w, :]))
+                    sub_labels.append((lbl_path.stem + f"_{count:02}" + lbl_path.suffix, label[i*h:(i+1)*h, j*w:(j+1)*w, :]))
+                    count += 1
+            break
+
+        if save_dir is not None:
+            image_dir = Path(save_dir) / "images"
+            label_dir = Path(save_dir) / "masks"
+            os.makedirs(image_dir) if not image_dir.exists() else None
+            os.makedirs(label_dir) if not label_dir.exists() else None
+            save_file = lambda dir, list:  [ski.io.imsave(dir / name, arr) for name, arr in list]
+            save_file(image_dir, sub_images)
+            save_file(label_dir, sub_labels)
+
+        return sub_images, sub_labels

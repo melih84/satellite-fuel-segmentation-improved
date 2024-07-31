@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 import skimage as ski
 from skimage.transform import resize
@@ -60,37 +61,6 @@ class Data():
         return small_img, small_lbl_dict
     
 
-class Processor():
-    def __init__(self, image_dir, mask_dir, class_dict):
-        self.class_dict = class_dict
-        self.image_dir = image_dir
-        self.mask_dir = mask_dir
-        self.img_idx = []
-        self.lbl_idx = []
-        self._get_filenames()
-        print(f"Number of images: {len(self.img_idx)}")
-        print(f"Number of labels: {len(self.lbl_idx)}")
-        print("="*10)   
 
-    def _get_filenames(self):
-        path_img = Path(self.image_dir)
-        path_lbl = Path(self.mask_dir)
-        self.img_idx = sorted(list(path_img.glob("*.jpg")))
-        self.lbl_idx = sorted(list(path_lbl.glob('*.png')))
-
-    def apply_split(self, division=2):
-        #TODO split labels and save images
-        for img, lbl in zip(self.img_idx, self.lbl_idx):
-            image = ski.io.imread(img)
-            print(image.shape)
-            H, W, _ = image.shape
-            h, w = int(H/division), int(W/division)
-            sub_images = [image[i*h:(i+1)*h,
-                                j*w:(j+1)*w,
-                                :]
-                for i in range(division)
-                for j in range(division)]
-            break
-        return sub_images
 
             
