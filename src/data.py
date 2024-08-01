@@ -34,7 +34,9 @@ class Data():
             label_dict[cls] = mask.astype("int")
         return label_dict
 
-    def get_batch(self, batch_size, size=None):
+    def get_batch(self, batch_size=None, size=None):
+        if batch_size is None:
+            batch_size = self.num_samples
         img_batch = self.img_idx[:batch_size]
         lbl_batch = self.lbl_idx[:batch_size]
         X, y = [], []
