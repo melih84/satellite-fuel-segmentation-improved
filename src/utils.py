@@ -52,6 +52,15 @@ class Visualize():
         if save_to is not None:
             plt.savefig(save_to, dpi=600, bbox_inches="tight")
     
+    def create_mask(self, prediction, save_to):
+        _, ax = plt.subplots(1,1)
+        ax.axis("off")
+
+        preds = self.combine_class(prediction).astype("uint8")
+        print(preds.shape, type(preds))
+        plt.imsave(save_to, preds)
+
+
     @staticmethod
     def _paint(mask, color):
         new_mask = np.zeros(mask.shape + (3,))
