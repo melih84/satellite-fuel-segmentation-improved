@@ -59,7 +59,7 @@ class Data():
         print(f"X shape: {X.shape}")
         print(f"y shape: {y.shape}")
         print("="*10)
-        return X, y     # (B, 640, 640, 3); (B, 640, 640, CLS)
+        return X, y, self.sample_idx[:batch_size]
 
     def apply_resize(self, img, lbl_dict, size):
         small_img = resize(img, size, preserve_range=True, anti_aliasing=True).astype("int")
