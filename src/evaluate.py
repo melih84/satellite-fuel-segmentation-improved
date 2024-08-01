@@ -1,8 +1,8 @@
 import numpy as np
 from sklearn.metrics import precision_score, recall_score, f1_score, jaccard_score
 
-def make_predicitons(model, X):
-    probs = model.predict(X)
+def make_predicitons(model, X, batch_size=None):
+    probs = model.predict(X, batch_size=batch_size)
     y_pred = np.argmax(probs, axis=-1)
     n_class = probs.shape[-1]
     y_pred_one_hot = np.array([(y_pred == i).astype("int") for i in range(n_class)])
