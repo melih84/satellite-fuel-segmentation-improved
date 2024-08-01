@@ -4,6 +4,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import skimage as ski
+import pandas as pd
 
 
 COLOR_CODE = {
@@ -108,3 +109,10 @@ class DataProcessor():
 
         
         return sub_images, sub_labels
+    
+
+def get_class_dict(class_info_path):
+    df = pd.read_csv(class_info_path)
+    df.index = df["name"]
+    class_dict= df[["r", "g", "b"]].transpose().to_dict()
+    return class_dict
