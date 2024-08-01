@@ -23,6 +23,7 @@ class Data():
         path_lbl = Path(self.mask_dir)
         self.img_idx = sorted(list(path_img.glob("*.jpg")))
         self.lbl_idx = sorted(list(path_lbl.glob('*.png')))
+        self.sample_idx = [p.stem for p in self.img_idx]
      
     def get_class_label(self, label):
         label_dict = {}
