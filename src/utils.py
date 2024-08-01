@@ -115,4 +115,6 @@ def get_class_dict(class_info_path):
     df = pd.read_csv(class_info_path)
     df.index = df["name"]
     class_dict= df[["r", "g", "b"]].transpose().to_dict()
-    return class_dict
+    class_to_fuel = {i:cls for i, cls in enumerate(class_dict.keys())}
+    fuel_to_class = {cls:i for i, cls in enumerate(class_dict.keys())}
+    return (class_dict, class_to_fuel, fuel_to_class)
