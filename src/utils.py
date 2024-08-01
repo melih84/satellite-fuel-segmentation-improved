@@ -57,7 +57,6 @@ class Visualize():
         ax.axis("off")
 
         preds = self.combine_class(prediction).astype("uint8")
-        print(preds.shape, type(preds))
         plt.imsave(save_to, preds)
 
 
