@@ -10,7 +10,10 @@ class Data():
         self.class_dict = class_dict
         self.image_dir = image_dir
         self.mask_dir = mask_dir
+        
         self._get_filenames()
+        self.num_samples = len(self.img_idx)
+
         print(f"Number of images: {len(self.img_idx)}")
         print(f"Number of labels: {len(self.lbl_idx)}")
         print("="*10)   
