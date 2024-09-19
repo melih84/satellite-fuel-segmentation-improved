@@ -75,7 +75,7 @@ image_formats = ['bmp', 'jpg', 'jpeg', 'png', 'tif', 'tiff']
 
 
 
-class Dataset():
+class Dataset(keras.utils.Sequence):
     def __init__(self, path, img_size=320, batch_size=4,
                  shuffle=True, augment=False,
                  color_ids=["#FFFFFF", "#000000"]):
@@ -86,7 +86,7 @@ class Dataset():
         self.shuffle = shuffle
         self.augment = augment
         self.color_ids = color_ids
-
+        
         img_path = self.path / "images"
         msk_path = self.path / "masks"
         img_filenames = [f for f in sorted(img_path.glob("*.*")) if f.name.split(".")[-1] in image_formats]
@@ -98,6 +98,8 @@ class Dataset():
         n = len(self.image_files)
         self.indices = list(range(n))
 
+        self.on_epoch_end()
+
     def __len__(self):
         # Denotes the number of batches per epoch
         return int(len(self.indices) / self.batch_size)
@@ -106,7 +108,6 @@ class Dataset():
         # Geneates one batch of data
         batch_indices = self.indices[index*self.batch_size:(index+1)*self.batch_size]
         X, y = self._generate_data(batch_indices)
-        breakpoint()
         return X, y
 
     def _generate_data(self, indices):
@@ -120,6 +121,11 @@ class Dataset():
             X.append(img), y.append(msk)
         return np.array(X), np.array(y)      
 
+    def on_epoch_end(self):
+        # Updates indexes after each epoch
+        if self.shuffle:
+            np.random.shuffle(self.indices)
+
     def rgb2class(self, rgb_mask):
         masks = []
         for hex_id in self.color_ids:
@@ -130,28 +136,6 @@ class Dataset():
         return np.moveaxis(mask, 0, -1)
 
 
-# class DataGenerator(keras.utils.Sequence):
-#         def __init__(self, dataset, batch_size=4,)
-
-#         # msk_filenames, sample_ids = [f, f.stem for f in msk_path.glob("*.*")]
-#         # for f in img_filenames:
-#         #     if f.stem in sample_ids:
-#         #         continue
-#         #     else
-
-#         # label_filenames =list(msk_path.glob("*"))
-#         # assert filenames, f"No images found in ./{self.path}/images"
-#         # for f in filenames:
-#         #     if f.stem
-        breakpoint()
-
-        # path_img = Path(self.image_dir)
-        # path_lbl = Path(self.mask_dir)
-        # self.img_idx = sorted(list(path_img.glob("*.jpg")))
-        # self.lbl_idx = sorted(list(path_lbl.glob('*.png')))
-        # self.sample_idx = [p.stem for p in self.img_idx]      
-
 if __name__ == "__main__":
     path = "./data/winter_conifer_alberta_320x320"
-    loader = Dataset(path)
-    breakpoint()
+    dataset = Dataset(path)
