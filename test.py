@@ -4,6 +4,7 @@ import yaml
 from tensorflow.keras.models import load_model
 
 from src.data import Dataset, DataGenerator
+from src.utils import probs_to_one_hot
 
 
 def test(data_dict,
@@ -20,6 +21,7 @@ def test(data_dict,
                               batch_size=batch_size)
     
     probs = model.predict(test_data)
+    outputs = probs_to_one_hot(probs)
     breakpoint()
 
 if __name__ == "__main__":
