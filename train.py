@@ -94,7 +94,7 @@ if __name__ == "__main__":
     # parser.add_argument("config", type=str, help="model.yaml path")
     parser.add_argument("--hyp", type=str, default="hyperparameters/hyp.yaml")
     parser.add_argument("--image-size", type=int, default=320)
-    parser.add_argument("--sample-size", type=int, default=-1)
+    parser.add_argument("--sample-size", type=int, default=None)
     parser.add_argument("--epochs", type=int, default=20)
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--lr-decay", action="store_true")

@@ -11,7 +11,7 @@ import tensorflow.keras as keras
 image_formats = ['bmp', 'jpg', 'jpeg', 'png', 'tif', 'tiff']
 
 class Dataset:
-    def __init__(self, path, img_size=320, split_ratio=1.0, shuffle=True, sample_size=-1,
+    def __init__(self, path, img_size=320, split_ratio=1.0, shuffle=True, sample_size=None,
                  color_ids=["#FFFFFF", "#000000"]):
         
         self.path = path if isinstance(path, Path) else Path(path)
@@ -24,6 +24,8 @@ class Dataset:
         img_filenames = [f for f in sorted(img_path.glob("*.*")) if f.name.split(".")[-1] in image_formats]
         msk_filenames = [f for f in sorted(msk_path.glob("*.*")) if f.name.split(".")[-1] in image_formats]
         
+        assert len(img_filenames) > 0, f"No images found in {img_path}"
+        assert len(msk_filenames) > 0, f"No masks found in {msk_path}"
         assert len(img_filenames) == len(msk_filenames), f"Images and masks are inconsistent... {len(img_filenames)} images and {len(msk_filenames)} found"
 
         self.image_files, self.mask_files = img_filenames, msk_filenames
