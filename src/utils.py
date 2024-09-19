@@ -142,3 +142,10 @@ def increment_path(path, exist_ok=True, sep=''):
         i = [int(m.groups()[0]) for m in matches if m]  # indices
         n = max(i) + 1 if i else 2  # increment number
         return f"{path}{sep}{n}"  # update path
+
+def probs_to_one_hot(probs):
+    y_pred = np.argmax(probs, axis=-1)
+    n_class = probs.shape[-1]
+    y_pred_one_hot = np.array([(y_pred == i).astype("int") for i in range(n_class)])
+    y_pred_one_hot = np.moveaxis(y_pred_one_hot, 0, -1) 
+    return y_pred_one_hot
