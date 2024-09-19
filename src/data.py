@@ -42,9 +42,10 @@ class Dataset:
         train_size = round(split_ratio * n)
         self.train_indices = self.indices[:train_size]
         self.valid_indices = self.indices[train_size:n]
-
+        
         assert len(self.train_indices) > 0, f"Train set is empty."
-        assert len(self.valid_indices) > 0, f"Validation set is empty."
+        if split_ratio < 1.0:
+            assert (len(self.valid_indices) > 0), f"Validation set is empty."
 
 
 
