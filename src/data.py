@@ -1,8 +1,7 @@
 from pathlib import Path
 import os
 
-import skimage as ski
-from skimage.transform import resize
+# from skimage.transform import resize
 import numpy as np
 from PIL import ImageColor
 import cv2
