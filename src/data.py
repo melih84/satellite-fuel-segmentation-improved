@@ -4,6 +4,10 @@ import os
 import skimage as ski
 from skimage.transform import resize
 import numpy as np
+from PIL import ImageColor
+import cv2
+
+image_formats = ['bmp', 'jpg', 'jpeg', 'png', 'tif', 'tiff']
 
 class Data():
     def __init__(self, image_dir, mask_dir, class_dict):
@@ -69,4 +73,66 @@ class Data():
 
 
 
-            
+class LoadImagesAndMasks():
+    def __init__(self, path, img_size=320, batch_size=4, augment=False,
+                 color_ids=["#FFFFFF", "#000000"]):
+        
+        self.path = path if isinstance(path, Path) else Path(path)
+        self.img_size = img_size
+        self.augment = augment
+        self.color_ids = color_ids
+
+        img_path = self.path / "images"
+        msk_path = self.path / "masks"
+        img_filenames = [f for f in sorted(img_path.glob("*.*")) if f.name.split(".")[-1] in image_formats]
+        msk_filenames = [f for f in sorted(msk_path.glob("*.*")) if f.name.split(".")[-1] in image_formats]
+        
+        assert len(img_filenames) == len(msk_filenames), f"Images and masks are inconsistent... {len(img_filenames)} images and {len(msk_filenames)} found"
+
+        self.image_files, self.mask_files = img_filenames, msk_filenames
+        n = len(self.image_files)
+        self.indices = range(n)
+
+    def __getitem__(self, index):
+        index = self.indices[index]
+        img_path = self.image_files[index]
+        msk_path = self.mask_files[index]
+        img = cv2.imread(img_path)
+        msk_rgb = cv2.imread(msk_path)
+        msk = self.rgb2class(msk_rgb)
+        return img, msk_rgb, msk
+
+
+    def rgb2class(self, rgb_mask):
+        masks = []
+        for hex_id in self.color_ids:
+            r, g, b = ImageColor.getcolor(hex_id, "RGB")
+            mask = (rgb_mask[:,:,0] == r) * (rgb_mask[:,:,1] == g) * (rgb_mask[:,:,2] == b)
+            masks.append(mask)
+        mask = np.array(masks)
+        return np.moveaxis(mask, 0, -1)
+
+
+
+        # msk_filenames, sample_ids = [f, f.stem for f in msk_path.glob("*.*")]
+        # for f in img_filenames:
+        #     if f.stem in sample_ids:
+        #         continue
+        #     else
+
+        # label_filenames =list(msk_path.glob("*"))
+        # assert filenames, f"No images found in ./{self.path}/images"
+        # for f in filenames:
+        #     if f.stem
+        breakpoint()
+
+        # path_img = Path(self.image_dir)
+        # path_lbl = Path(self.mask_dir)
+        # self.img_idx = sorted(list(path_img.glob("*.jpg")))
+        # self.lbl_idx = sorted(list(path_lbl.glob('*.png')))
+        # self.sample_idx = [p.stem for p in self.img_idx]      
+
+if __name__ == "__main__":
+    path = "./data/winter_conifer_alberta_320x320"
+    loader = LoadImagesAndMasks(path)
+    breakpoint()
