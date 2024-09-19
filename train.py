@@ -4,7 +4,7 @@ from pathlib import Path
 
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import MeanIoU#, F1Score
-from tensorflow.keras.callbacks import TensorBoard
+from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint
 # from tensorboardX import SummaryWriter
 
 from src.networks import unet
@@ -12,7 +12,7 @@ from src.data import Dataset, DataGenerator
 from src.utils import increment_path
 
 def train(hyp, opt):
-    epochs, batch_size, device, save_dir, img_size = opt.epochs, opt.batch_size, opt.device, Path(opt.save_dir), opt.image_size
+    epochs, batch_size, device, save_dir, img_size, sample_size = opt.epochs, opt.batch_size, opt.device, Path(opt.save_dir), opt.image_size, opt.sample_size
 
     # Save run settings
     with open(save_dir / "hyp.yaml", "w") as f:
@@ -35,6 +35,7 @@ def train(hyp, opt):
 
     dataset = Dataset(path=train_path,
                       img_size=img_size,
+                      sample_size=sample_size,
                       shuffle=True,
                       split_ratio=0.8,
                       color_ids=color_ids)
@@ -68,16 +69,23 @@ def train(hyp, opt):
 
     # Callbacks
     log_dir = save_dir / "logs"
-    tbcb = TensorBoard(log_dir=log_dir,
+    tb_cb = TensorBoard(log_dir=log_dir,
                        update_freq="batch")
-    
     print(f"TensorBoard: view training progress by running: tensorboard --logdir {log_dir}")
+
+    checkpoint_dir = save_dir / "checkpoints"
+    save_cb = ModelCheckpoint(filepath=str(checkpoint_dir) + "/checkpoint.best_model.keras",
+                             monitor="val_loss",
+                             mode="min",
+                             save_best_only=True)
+    
+    
     
     # Start training
     model.fit(train_data,
               validation_data=valid_data,
               epochs=epochs,
-              callbacks=[tbcb])
+              callbacks=[tb_cb, save_cb])
     
 
 if __name__ == "__main__":
@@ -86,6 +94,7 @@ if __name__ == "__main__":
     # parser.add_argument("config", type=str, help="model.yaml path")
     parser.add_argument("--hyp", type=str, default="hyperparameters/hyp.yaml")
     parser.add_argument("--image-size", type=int, default=320)
+    parser.add_argument("--sample-size", type=int, default=-1)
     parser.add_argument("--epochs", type=int, default=20)
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--lr-decay", action="store_true")
