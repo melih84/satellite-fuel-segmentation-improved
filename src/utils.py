@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import skimage as ski
 import pandas as pd
+from PIL import ImageColor
 
 
 COLOR_CODE = {
@@ -149,3 +150,14 @@ def probs_to_one_hot(probs):
     y_pred_one_hot = np.array([(y_pred == i).astype("int") for i in range(n_class)])
     y_pred_one_hot = np.moveaxis(y_pred_one_hot, 0, -1) 
     return y_pred_one_hot
+
+def one_hot_to_rgb(one_hots, color_ids):
+    nc = one_hots.shape[-1]
+    masks_list = []
+    for mask in one_hots:
+        mask_rgb = np.zeros(mask.shape[:2] + (3,))
+        for cls in range(nc):
+            for ch, val in enumerate(ImageColor.getcolor(color_ids[cls], "RGB")):
+                mask_rgb[...,ch] += mask[...,cls] * val
+        masks_list.append(mask_rgb)
+    return masks_list
