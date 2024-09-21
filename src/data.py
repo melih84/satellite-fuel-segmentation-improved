@@ -29,9 +29,11 @@ class Dataset:
         assert len(img_filenames) == len(msk_filenames), f"Images and masks are inconsistent... {len(img_filenames)} images and {len(msk_filenames)} found"
 
         self.image_files, self.mask_files = img_filenames, msk_filenames
+
         
         n = int(len(self.image_files))
         self.indices = list(range(n))
+        self.index_to_id = {i:f.stem for i, f in enumerate(img_filenames)}
         
         if self.shuffle:
             np.random.shuffle(self.indices)
@@ -49,21 +51,24 @@ class Dataset:
 
 
 
-
 class DataGenerator(keras.utils.Sequence):
-    def __init__(self, dataset: Dataset, partition="train",
-                 batch_size=4, shuffle=True, augment=False):
+    def __init__(self, dataset: Dataset, task="train",
+                 batch_size=4, shuffle_on_epoch=True, augment=False):
             
             self.dataset = dataset
             self.batch_size = batch_size
-            self.shuffle = shuffle
+            self.shuffle = shuffle_on_epoch
             self.augment = augment
+            self.task = task
 
-            if partition == "train":
+            if task == "train":
                 self.indices = self.dataset.train_indices
-            else:
+            if task == "valid":
                 self.indices = self.dataset.valid_indices
+            if task == "test":
+                self.indices = self.dataset.indices
 
+            self.ids = [self.dataset.index_to_id[i] for i in self.indices]
             self.on_epoch_end()
 
     def __len__(self):
@@ -89,7 +94,7 @@ class DataGenerator(keras.utils.Sequence):
 
     def on_epoch_end(self):
         # Updates indexes after each epoch
-        if self.shuffle:
+        if self.shuffle and self.task != "test":
             np.random.shuffle(self.indices)
 
     def rgb2class(self, rgb_mask):

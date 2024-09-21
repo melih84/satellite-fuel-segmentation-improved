@@ -41,14 +41,14 @@ def train(hyp, opt):
                       color_ids=color_ids)
     
     train_data = DataGenerator(dataset=dataset,
-                               partition="train",
+                               task="train",
                                batch_size=batch_size,
-                               shuffle=True)
+                               shuffle_on_epoch=True)
     
     valid_data = DataGenerator(dataset=dataset,
-                               partition="valid",
+                               task="valid",
                                batch_size=batch_size,
-                               shuffle=True)
+                               shuffle_on_epoch=True)
 
     # Model
     model = unet(input_size=(img_size, img_size, 3), output_classes=nc)
