@@ -16,8 +16,9 @@ echo ""
 echo "Activating the environment..."
 module load cuda
 source ~/.venv_tf/bin/activate
+ module load gcc opencv/4.10.0 python scipy-stack/2024a
 echo "GPU device info:"
 python ../compute-canada/tf_device_info.py
-python main.py --study-id "samples_1000" --n_epochs 100 --batch_size 4
+python train.py data/winter_conifer_alberta_320x320/winter_conifer_alberta.yaml --epoch 100 --lr-decay
 
 echo "Job ID $SLURM_JOB_ID finished with exit code $? at: `date`"
