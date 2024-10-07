@@ -1,1 +1,2 @@
-lr0: 3.0e-4         # initial learning rate
+lr0: 3.0e-4         # initial learning rate / target lr after warmup
+lrf: 1.0e-6         # final learning rate

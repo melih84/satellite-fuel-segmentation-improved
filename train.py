@@ -2,7 +2,7 @@ import argparse
 import yaml
 from pathlib import Path
 
-from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.optimizers import Adam, schedules
 from tensorflow.keras.metrics import MeanIoU#, F1Score
 from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint
 # from tensorboardX import SummaryWriter
@@ -55,9 +55,18 @@ def train(hyp, opt):
     model.summary()
 
     # Optimizer
+    steps_per_epoch = len(train_data)
+    total_steps = epochs * steps_per_epoch
     if opt.lr_decay:
-        pass
-        #TODO implement scheduler
+        warmup_steps = int(total_steps / 10)
+        decay_steps = total_steps - warmup_steps
+        lr = schedules.CosineDecay(
+            initial_learning_rate=.1*hyp["lr0"],
+            decay_steps=decay_steps,
+            alpha=hyp["lrf"],
+            warmup_target=hyp["lr0"],
+            warmup_steps=warmup_steps
+        )
     else:
         lr = hyp["lr0"]
 
@@ -66,7 +75,6 @@ def train(hyp, opt):
                   metrics = [MeanIoU(num_classes=nc,
                                     sparse_y_true=False,
                                     sparse_y_pred=False)])
-
     # Callbacks
     log_dir = save_dir / "logs"
     tb_cb = TensorBoard(log_dir=log_dir,
