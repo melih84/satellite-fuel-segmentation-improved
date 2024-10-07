@@ -1,2 +1,4 @@
 lr0: 3.0e-4         # initial learning rate / target lr after warmup
 lrf: 1.0e-6         # final learning rate
+gamma: 2.0          # focal cross-entropy loss focusing parameter (gamma=0 to ignore focal loss)
+alpha: 0.5          # focal cross-entropy loss weight balancing factor

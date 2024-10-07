@@ -3,6 +3,7 @@ import yaml
 from pathlib import Path
 
 from tensorflow.keras.optimizers import Adam, schedules
+from tensorflow.keras.losses import CategoricalFocalCrossentropy
 from tensorflow.keras.metrics import MeanIoU#, F1Score
 from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint
 # from tensorboardX import SummaryWriter
@@ -70,8 +71,13 @@ def train(hyp, opt):
     else:
         lr = hyp["lr0"]
 
+    loss_fn = CategoricalFocalCrossentropy(
+        gamma=hyp["gamma"],
+        alpha=hyp["alpha"]
+    )
+
     model.compile(optimizer = Adam(learning_rate = lr),
-                  loss = 'categorical_crossentropy',
+                  loss = loss_fn,
                   metrics = [MeanIoU(num_classes=nc,
                                     sparse_y_true=False,
                                     sparse_y_pred=False)])
