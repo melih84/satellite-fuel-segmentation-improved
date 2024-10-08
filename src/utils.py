@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import skimage as ski
 import pandas as pd
 from PIL import ImageColor
+import cv2
 
 
 COLOR_CODE = {
@@ -106,7 +107,7 @@ class DataProcessor():
                     sub_images.append((img_path.stem + f"_{count:02}" + img_path.suffix, image[i*h:(i+1)*h, j*w:(j+1)*w, :]))
                     sub_labels.append((lbl_path.stem + f"_{count:02}" + lbl_path.suffix, label[i*h:(i+1)*h, j*w:(j+1)*w, :]))
                     count += 1
-            print(f"Split {curr_num} / {num_image}", flush=True, end="\r")
+            print(f"Split {curr_num} / {num_image}", flush=True, end="/r")
             curr_num += 1
         
         print("")
@@ -139,7 +140,7 @@ def increment_path(path, exist_ok=True, sep=''):
         return str(path)
     else:
         dirs = glob.glob(f"{path}{sep}*")  # similar paths
-        matches = [re.search(rf"%s{sep}(\d+)" % path.stem, d) for d in dirs]
+        matches = [re.search(rf"%s{sep}(/d+)" % path.stem, d) for d in dirs]
         i = [int(m.groups()[0]) for m in matches if m]  # indices
         n = max(i) + 1 if i else 2  # increment number
         return f"{path}{sep}{n}"  # update path
@@ -161,3 +162,36 @@ def one_hot_to_rgb(one_hots, color_ids):
                 mask_rgb[...,ch] += mask[...,cls] * val
         masks_list.append(mask_rgb)
     return masks_list
+
+
+# PLOTS
+def overlay_mask(img, msk):
+    return cv2.addWeighted(img, 1, msk, .5, 0)
+
+def segmentation_to_conour(img, msk):
+    RGBforLabel = {1:(0,0,255), 2:(0,255,0)}
+    contours, _ = cv2.findContours(msk, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    for c in contours:
+        # Find mean colour inside this contour by doing a masked mean
+        mask = np.zeros(msk.shape, np.uint8)
+        cv2.drawContours(mask, [c],-1, 255, -1)
+        mean, _, _, _ = cv2.mean(msk, mask=mask)
+        # Get appropriate colour for this label
+        label = 2 if mean > 1.0 else 1
+        colour = RGBforLabel.get(label)
+        cv2.drawContours(img, [c], -1, colour, 2)
+    return img
+
+if __name__ == "__main__":
+    image_dir = Path("data/verification_moncton_320x320/")
+    mask_dir = Path("runs/test/exp_18/")
+    overlay_dir = mask_dir / "overlays"
+    overlay_dir.mkdir(parents=True, exist_ok=True)
+    images = list(image_dir.glob("*.png"))
+    # masks = list(mask_dir.glob("*.png"))
+    for image in images:
+        name = image.stem
+        img = cv2.imread(image)
+        msk = cv2.imread(mask_dir / f"{name}.png", cv2.IMREAD_GRAYSCALE)
+        img = segmentation_to_conour(img, msk)
+        cv2.imwrite(overlay_dir/ f"{name}.png", img)
