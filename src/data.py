@@ -53,12 +53,12 @@ class Dataset:
 
 class DataGenerator(keras.utils.Sequence):
     def __init__(self, dataset: Dataset, task="train",
-                 batch_size=4, shuffle_on_epoch=True, augment=False):
+                 batch_size=4, shuffle_on_epoch=True, augment_dict=None):
             
             self.dataset = dataset
             self.batch_size = batch_size
             self.shuffle = shuffle_on_epoch
-            self.augment = augment
+            self.augment = augment_dict
             self.task = task
 
             if task == "train":
@@ -86,7 +86,7 @@ class DataGenerator(keras.utils.Sequence):
         for index in indices:
             img_path = self.dataset.image_files[index]
             msk_path = self.dataset.mask_files[index]
-            img = cv2.imread(img_path)
+            img = cv2.imread(img_path) / 255.
             msk_rgb = cv2.imread(msk_path)
             msk = self.rgb2class(msk_rgb)
             X.append(img), y.append(msk)
@@ -105,6 +105,11 @@ class DataGenerator(keras.utils.Sequence):
             masks.append(mask)
         mask = np.array(masks)
         return np.moveaxis(mask, 0, -1)
+    
+    def random_verical_flip(img, p=.5):
+        if randdom.random < p:
+            pass
+
 
 
 if __name__ == "__main__":
