@@ -52,7 +52,7 @@ def train(hyp, opt):
                                shuffle_on_epoch=True)
 
     # Model
-    model = unet(input_size=(img_size, img_size, 3), output_classes=nc)
+    model = unet(input_size=(None, None, 3), output_classes=nc)
     model.summary()
 
     # Optimizer
