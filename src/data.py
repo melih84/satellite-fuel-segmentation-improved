@@ -57,7 +57,6 @@ class DataGenerator(keras.utils.Sequence):
                  batch_size=4, shuffle_on_epoch=True, augment_dict=None):
             
             self.dataset = dataset
-            self.batch_size = batch_size
             self.shuffle = shuffle_on_epoch
             self.augment = augment_dict
             self.task = task
@@ -69,6 +68,7 @@ class DataGenerator(keras.utils.Sequence):
             if task == "test":
                 self.indices = self.dataset.indices
 
+            self.batch_size = min(batch_size, len(self.indices))
             self.ids = [self.dataset.index_to_id[i] for i in self.indices]
             self.on_epoch_end()
 
