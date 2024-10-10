@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import random
 
 # from skimage.transform import resize
 import numpy as np
@@ -106,9 +107,43 @@ class DataGenerator(keras.utils.Sequence):
         mask = np.array(masks)
         return np.moveaxis(mask, 0, -1)
     
-    def random_verical_flip(img, p=.5):
-        if randdom.random < p:
-            pass
+    def random_verical_flip(img, msk, p=.5):
+        if random.random < p:
+            img = cv2.flip(img, 0)
+            msk = cv2.flip(msk, 0)
+        return img, msk
+
+class LoadImages(keras.utils.Sequence): # Inference
+    def __init__(self, path):
+        
+        self.path = path if isinstance(path, Path) else Path(path)
+
+        img_path = self.path
+        img_filenames = [f for f in sorted(img_path.glob("*.*")) if f.name.split(".")[-1] in image_formats]
+        
+        assert len(img_filenames) > 0, f"No images found in {img_path}"
+
+        self.image_files = img_filenames
+
+        
+        n = int(len(self.image_files))
+        self.indices = list(range(n))
+        self.index_to_id = {i:f.stem for i, f in enumerate(img_filenames)}
+        self.nf = n
+
+        self.ids = [self.index_to_id[i] for i in self.indices]
+
+    def __len__(self):
+        return self.nf
+
+    def __getitem__(self, index):
+        
+        img_path = self.image_files[index]
+        img = cv2.imread(img_path) / 255.
+        assert img is not None, f"Image not found {img_path}"
+        return img.reshape((1,) + img.shape)
+        
+
 
 
 
