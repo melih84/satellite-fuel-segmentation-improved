@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+import time
 
 import yaml
 from tensorflow.keras.models import load_model
@@ -18,11 +19,17 @@ def detect():
     path, save_dir = opt.source, opt.save_dir
     
     dataset = LoadImages(path=path)
-    
-    probs = model.predict(dataset)
-    one_hots = probs_to_one_hot(probs)
-    pred_masks = one_hot_to_rgb(one_hots, color_ids=color_ids)
-    save_image(pred_masks, dataset.ids, save_dir)
+    for data, name in dataset:
+        t1 = time.time()
+        print(name, end=" ", flush=True)
+
+        probs = model.predict(data)
+        one_hots = probs_to_one_hot(probs)
+        pred_masks = one_hot_to_rgb(one_hots, color_ids=color_ids)
+
+        t2 = time.time()
+        save_image(pred_masks, dataset.ids, save_dir)
+        print(f"Done. ({(1E3 * (t2 - t1)):.1f}ms) Inference")
 
 def save_image(images, ids, save_dir=""):
     for image, id in zip(images, ids):
