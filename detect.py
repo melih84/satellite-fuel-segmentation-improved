@@ -29,7 +29,7 @@ def detect():
 
         t2 = time.time()
         print(f"Done. ({(1E3 * (t2 - t1)):.1f}ms) Inference")
-        save_image(pred_mask, name, save_dir)
+        save_image(pred_mask, [name], save_dir)
 
 def save_image(images, ids, save_dir=""):
     for image, id in zip(images, ids):
