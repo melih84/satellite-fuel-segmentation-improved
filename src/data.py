@@ -177,10 +177,11 @@ class LoadImages(keras.utils.Sequence): # Inference
         else:
             self.count += 1
             index = self.count - 1
+            name = self.ids[index]
             img_path = self.image_files[index]
             img = cv2.imread(img_path) / 255.
             assert img is not None, f"Image not found {img_path}"
-            return img.reshape((1,) + img.shape), img_path
+            return img.reshape((1,) + img.shape), img_path, name
 
 
 if __name__ == "__main__":

@@ -19,22 +19,23 @@ def detect():
     path, save_dir = opt.source, opt.save_dir
     
     dataset = LoadImages(path=path)
-    for data, name in dataset:
+    for data, path, name in dataset:
         t1 = time.time()
-        print(name, end=" ", flush=True)
+        print(path, end=" ", flush=True)
 
         probs = model.predict(data)
-        one_hots = probs_to_one_hot(probs)
-        pred_masks = one_hot_to_rgb(one_hots, color_ids=color_ids)
+        one_hot = probs_to_one_hot(probs)
+        pred_mask = one_hot_to_rgb(one_hot, color_ids=color_ids)
 
         t2 = time.time()
-        save_image(pred_masks, dataset.ids, save_dir)
         print(f"Done. ({(1E3 * (t2 - t1)):.1f}ms) Inference")
+        save_image(pred_mask, name, save_dir)
 
 def save_image(images, ids, save_dir=""):
     for image, id in zip(images, ids):
         path = Path(save_dir) / f"{id}.png"
         cv2.imwrite(path, image)
+        print(f" Saved in: {path}")
 
 
 if __name__ == "__main__":
