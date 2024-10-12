@@ -174,7 +174,7 @@ def segmentation_to_contour(img, msk):
     msk = msk.astype(np.uint8)
     if np.all((img >= 0) & (img <= 1)):
         img = (img * 255).astype(np.uint8)
-    contours, _ = cv2.findContours(msk, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    contours, _ = cv2.findContours(msk, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     for c in contours:
         # Find mean colour inside this contour by doing a masked mean
         mask = np.zeros(msk.shape, np.uint8)
