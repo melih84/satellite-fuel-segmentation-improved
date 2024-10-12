@@ -1,3 +1,8 @@
+# Activate environemnt on Compute Canada:
+`. bash/activate_env.sh` or `source bash/activate_env.sh`
+
+
+
 Project Compute Canada Cluster: **Graham**
 # Bugs
  - The training stops pre-maturely. 
