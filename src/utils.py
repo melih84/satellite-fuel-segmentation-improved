@@ -168,8 +168,12 @@ def one_hot_to_rgb(one_hots, color_ids):
 def overlay_mask(img, msk):
     return cv2.addWeighted(img, 1, msk, .5, 0)
 
-def segmentation_to_conour(img, msk):
-    RGBforLabel = {1:(0,0,255), 2:(0,255,0)}
+def segmentation_to_contour(img, msk):
+    # msk: a flat gray-scale uint8 array
+    RGBforLabel = {1:(0,255,0), 2:(0,255,0)}    # BUG the color changes from RGB to BRG
+    msk = msk.astype(np.uint8)
+    if np.all((img >= 0) & (img <= 1)):
+        img = (img * 255).astype(np.uint8)
     contours, _ = cv2.findContours(msk, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     for c in contours:
         # Find mean colour inside this contour by doing a masked mean
@@ -183,8 +187,8 @@ def segmentation_to_conour(img, msk):
     return img
 
 if __name__ == "__main__":
-    image_dir = Path("data/verification_moncton_320x320/")
-    mask_dir = Path("runs/test/exp_18/")
+    image_dir = Path("inference")
+    mask_dir = Path("runs/detect/exp_23/")
     overlay_dir = mask_dir / "overlays"
     overlay_dir.mkdir(parents=True, exist_ok=True)
     images = list(image_dir.glob("*.png"))
@@ -193,5 +197,5 @@ if __name__ == "__main__":
         name = image.stem
         img = cv2.imread(image)
         msk = cv2.imread(mask_dir / f"{name}.png", cv2.IMREAD_GRAYSCALE)
-        img = segmentation_to_conour(img, msk)
+        img = segmentation_to_contour(img, msk)
         cv2.imwrite(overlay_dir/ f"{name}.png", img)

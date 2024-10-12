@@ -1,13 +1,14 @@
 import argparse
 from pathlib import Path
 import time
+import os
 
 import yaml
 from tensorflow.keras.models import load_model
 import cv2
 
 from src.data import LoadImages
-from src.utils import probs_to_one_hot, one_hot_to_rgb, increment_path
+from src.utils import probs_to_one_hot, one_hot_to_rgb, increment_path, segmentation_to_contour
 
 # TODO HARD CODED (to be fixed by storing class metadata in the saved .keras models) (maybe)
 # class names
@@ -29,13 +30,19 @@ def detect():
 
         t2 = time.time()
         print(f"Done. ({(1E3 * (t2 - t1)):.1f}ms) Inference")
-        save_image(pred_mask, [name], save_dir)
+        
+        save_image(pred_mask[0], name, save_dir)
+        
+        contour_overlay = segmentation_to_contour(data[0], one_hot[0,...,0])    # may crash for multi-class segmentaiton
+        save_image(contour_overlay, name, save_dir + "/overlay")
 
-def save_image(images, ids, save_dir=""):
-    for image, id in zip(images, ids):
-        path = Path(save_dir) / f"{id}.png"
-        cv2.imwrite(path, image)
-        print(f" Saved in: {path}")
+def save_image(image, name, save_dir=""):
+    save_dir = Path(save_dir)
+    if not save_dir.exists():
+        save_dir.mkdir(parents=True)
+    path = save_dir / f"{name}.png"
+    cv2.imwrite(path, image)
+    print(f" Saved in: {path}")
 
 
 if __name__ == "__main__":
