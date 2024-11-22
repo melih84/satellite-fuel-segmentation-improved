@@ -186,6 +186,20 @@ def segmentation_to_contour(img, msk):
         cv2.drawContours(img, [c], -1, colour, 2)
     return img
 
+def resize_to_nearest_multiple(image, num):
+    # Resizes the dimensions of the image to a number closest do 'num'
+     # Get the current dimensions
+    height, width = image.shape[1:3]
+    
+    # Calculate the nearest multiples of"num
+    new_height = round(height / num) * num
+    new_width = round(width / num) * num
+ 
+    # Resize the image
+    resized_image = cv2.resize(image[0], (new_width, new_height), interpolation=cv2.INTER_LINEAR)
+    return resized_image
+
+
 if __name__ == "__main__":
     image_dir = Path("inference")
     mask_dir = Path("runs/detect/exp_23/")

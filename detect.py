@@ -4,13 +4,14 @@ import argparse
 from pathlib import Path
 import time
 import os
+import numpy as np
 
 import yaml
 from tensorflow.keras.models import load_model
 import cv2
 
 from src.data import LoadImages
-from src.utils import probs_to_one_hot, one_hot_to_rgb, increment_path, segmentation_to_contour
+from src.utils import probs_to_one_hot, one_hot_to_rgb, increment_path, segmentation_to_contour, resize_to_nearest_multiple
 
 # TODO HARD CODED (to be fixed by storing class metadata in the saved .keras models) (maybe)
 # class names
@@ -22,8 +23,13 @@ def detect():
     path, save_dir = opt.source, opt.save_dir
     
     dataset = LoadImages(path=path)
+    # print("Dataset is ", dataset)
     for data, path, name in dataset:
         t1 = time.time()
+
+        data = resize_to_nearest_multiple(data, 16)
+        data = np.expand_dims(data, axis=0) # Add the batch dimension
+
         print(path, end=" ", flush=True)
 
         probs = model.predict(data)
